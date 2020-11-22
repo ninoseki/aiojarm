@@ -1,5 +1,8 @@
 # aiojarm
 
+![CI](https://github.com/ninoseki/aiojarm/workflows/CI/badge.svg)
+[![PyPI version](https://badge.fury.io/py/aiojarm.svg)](https://badge.fury.io/py/aiojarm)
+
 Async version of [JARM](https://github.com/salesforce/jarm).
 
 ## Installation

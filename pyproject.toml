@@ -8,6 +8,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.8"
 poetry-version = "^0.1.5"
+typer = "^0.3.2"
+aiometer = "^0.2.1"
 
 [tool.poetry.dev-dependencies]
 autoflake = "^1.4"
@@ -25,6 +27,9 @@ pytest-cov = "^2.10.1"
 pytest-sugar = "^0.9.4"
 pyupgrade = "^2.7.2"
 
+[tool.poetry.scripts]
+aiojarm = "aiojarm.cli:main_wrapper"
+
 [tool.isort]
 force_grid_wrap = 0
 include_trailing_comma = true
@@ -32,7 +37,6 @@ known_third_party = []
 line_length = 88
 multi_line_output = 3
 use_parentheses= true
-
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

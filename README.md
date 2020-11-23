@@ -55,6 +55,37 @@ print(fingerprints)
 # ]
 ```
 
+## CLI usage
+
+```bash
+$ aiojarm --help
+Usage: aiojarm [OPTIONS] HOSTNAMES...
+
+Arguments:
+  HOSTNAMES...  IPs/domains or a file which contains a list of IPs/domains per
+                line  [required]
+
+
+Options:
+  --port INTEGER         [default: 443]
+  --max-at-once INTEGER  [default: 8]
+  --install-completion   Install completion for the current shell.
+  --show-completion      Show completion for the current shell, to copy it or
+                         customize the installation.
+
+  --help                 Show this message and exit.
+
+$ aiojarm 1.1.1.1
+1.1.1.1,443,1.1.1.1,27d3ed3ed0003ed1dc42d43d00041d6183ff1bfae51ebd88d70384363d525c
+
+$ aiojarm google.com.ua google.gr
+google.com.ua,443,172.217.25.195,27d40d40d29d40d1dc42d43d00041d4689ee210389f4f6b4b5b1b93f92252d
+google.gr,443,216.58.220.131,27d40d40d29d40d1dc42d43d00041d4689ee210389f4f6b4b5b1b93f92252d
+
+# or you can input hostnames via a file
+$ aiojarm list.txt
+```
+
 ## License
 
 JARM is created by Salesforce's JARM team and it is licensed with 3-Clause "New" or "Revised" License.

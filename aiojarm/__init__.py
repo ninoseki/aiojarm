@@ -429,33 +429,47 @@ async def send_packet(
     sock: Optional[socket.socket] = None
     raw_ip: bool = False
     ip: Tuple[Optional[str], Optional[int]] = (None, None)
-    try:
-        # Determine if the input is an IP or domain name
-        try:
-            if (
-                type(ipaddress.ip_address(destination_host)) == ipaddress.IPv4Address
-            ) or (
-                type(ipaddress.ip_address(destination_host)) == ipaddress.IPv6Address
-            ):
-                raw_ip = True
-                ip = (
-                    destination_host,
-                    destination_port,
-                )
-        except ValueError:
-            ip = (None, None)
-            raw_ip = False
 
+    # Determine if the input is an IP or domain name
+    try:
+        if (type(ipaddress.ip_address(destination_host)) == ipaddress.IPv4Address) or (
+            type(ipaddress.ip_address(destination_host)) == ipaddress.IPv6Address
+        ):
+            raw_ip = True
+            ip = (
+                destination_host,
+                destination_port,
+            )
+    except ValueError:
+        ip = (None, None)
+        raw_ip = False
+
+    timeout = 2.0
+    try:
         # Connect the socket
         if ":" in destination_host:
             sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-            sock.settimeout(20.0)
-            await loop.sock_connect(sock, (destination_host, destination_port, 0, 0))
+            sock.setblocking(False)
+            await asyncio.wait_for(
+                loop.sock_connect(sock, (destination_host, destination_port, 0, 0)),
+                timeout=timeout,
+            )
         else:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.settimeout(20.0)
-            await loop.sock_connect(sock, (destination_host, destination_port))
+            sock.setblocking(False)
+            await asyncio.wait_for(
+                loop.sock_connect(sock, (destination_host, destination_port)),
+                timeout=timeout,
+            )
+    except (ConnectionRefusedError, socket.gaierror):
+        return b"CONNECTION_ERROR", ip[0]
+    except asyncio.TimeoutError:
+        return b"TIMEOUT", ip[0]
 
+    # Set connection timeout
+    sock.settimeout(timeout)
+
+    try:
         # Resolve IP if given a domain name
         if raw_ip is False:
             ip = sock.getpeername()
@@ -848,8 +862,8 @@ async def scan(
         server_hello, ip = await send_packet(
             destination_host, destination_port, payload
         )
-        # Deal with timeout error
-        if server_hello == "TIMEOUT":
+        # Deal with timeout & connection error
+        if server_hello == b"TIMEOUT" or server_hello == b"CONNECTION_ERROR":
             jarm = "|||,|||,|||,|||,|||,|||,|||,|||,|||,|||"
             break
         ans = read_packet(server_hello)

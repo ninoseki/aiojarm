@@ -353,7 +353,8 @@ def app_layer_proto_negotiation(jarm_details: JARM_DETAILS) -> bytes:
             b"\x08\x68\x74\x74\x70\x2f\x31\x2e\x31",
             b"\x06\x73\x70\x64\x79\x2f\x31",
             b"\x06\x73\x70\x64\x79\x2f\x32",
-            b"\x06\x73\x70\x64\x79\x2f\x33" b"\x02\x68\x32",
+            b"\x06\x73\x70\x64\x79\x2f\x33",
+            b"\x02\x68\x32",
             b"\x03\x68\x32\x63",
             b"\x02\x68\x71",
         ]
@@ -504,6 +505,7 @@ def read_packet(data: Optional[bytes]) -> str:
             return "|||"
         # Check for server hello
         elif (data[0] == 22) and (data[5] == 2):
+            server_hello_length = int.from_bytes(data[3:5], "big")
             counter = data[43]
             # Find server's selected cipher
             selected_cipher = data[counter + 44 : counter + 46]
@@ -515,7 +517,7 @@ def read_packet(data: Optional[bytes]) -> str:
             jarm += str(version.hex())
             jarm += "|"
             # Extract extensions
-            extensions = extract_extension_info(data, counter)
+            extensions = extract_extension_info(data, counter, server_hello_length)
             jarm += extensions
             return jarm
         else:
@@ -526,15 +528,18 @@ def read_packet(data: Optional[bytes]) -> str:
 
 
 # Deciphering the extensions in the server hello
-def extract_extension_info(data: bytes, counter: int) -> str:
+def extract_extension_info(data: bytes, counter: int, server_hello_length: int) -> str:
     try:
         # Error handling
         if data[counter + 47] == 11:
-            return "|||"
+            return "|"
         elif (data[counter + 50 : counter + 53] == b"\x0e\xac\x0b") or (
             data[82:85] == b"\x0f\xf0\x0b"
         ):
-            return "|||"
+            return "|"
+        elif counter + 42 >= server_hello_length:
+            return "|"
+
         count = 49 + counter
         length = int.from_bytes(data[counter + 47 : counter + 49], byteorder="big")
         maximum = length + (count - 1)
@@ -567,7 +572,7 @@ def extract_extension_info(data: bytes, counter: int) -> str:
         return result
     # Error handling
     except IndexError:
-        result = "|||"
+        result = "|"
         return result
 
 

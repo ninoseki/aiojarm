@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiojarm"
-version = "0.2.0"
+version = "0.2.1"
 description = "Async JARM client"
 authors = ["Manabu Niseki <manabu.niseki@gmail.com>"]
 readme = "README.md"

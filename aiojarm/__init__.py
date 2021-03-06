@@ -424,7 +424,9 @@ def supported_versions(jarm_details: JARM_DETAILS, grease: bool) -> bytes:
 
 # Send the assembled client hello using a socket
 async def send_packet(
-    destination_host: str, destination_port: int, packet: bytes,
+    destination_host: str,
+    destination_port: int,
+    packet: bytes,
 ) -> Tuple[Optional[bytes], Optional[str]]:
     loop = asyncio.get_event_loop()
     sock: Optional[socket.socket] = None
@@ -715,7 +717,8 @@ def version_byte(version: str) -> str:
 
 
 async def scan(
-    destination_host: str, destination_port: int = 443,
+    destination_host: str,
+    destination_port: int = 443,
 ) -> Tuple[str, int, Optional[str], str]:
     """Take a JARM fingerprint
 

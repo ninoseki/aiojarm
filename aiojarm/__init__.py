@@ -7,9 +7,12 @@ import socket
 import struct
 from typing import List, Optional, Tuple
 
-import poetry_version
+try:
+    import importlib.metadata as importlib_metadata
+except ModuleNotFoundError:
+    import importlib_metadata
 
-__version__ = str(poetry_version.extract(source_file=__file__))
+__version__ = importlib_metadata.version(__name__)
 
 # destination_host,destination_port,version,cipher_list,cipher_order,GREASE,RARE_APLN,1.3_SUPPORT,extension_orders
 JARM_DETAILS = Tuple[str, int, str, str, str, str, str, str, str]
